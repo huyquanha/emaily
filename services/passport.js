@@ -14,7 +14,7 @@ passport.serializeUser((user, done) => {
 });
 
 passport.deserializeUser((id, done) => {
-  User.findById(id).then(user => {
+  User.findById(id).then((user) => {
     done(null, user);
   });
 });
@@ -25,11 +25,12 @@ passport.use(
       clientID: keys.googleClientID,
       clientSecret: keys.googleClientSecret,
       // the route user will be sent to after they grant us permission
-      callbackURL: '/auth/google/callback'
+      callbackURL: '/auth/google/callback',
+      proxy: true,
     },
     // this callback function will be called after passport send the code back to Google and get the user profile in exchange
     (accessToken, refreshToken, profile, done) => {
-      User.findOne({ googleId: profile.id }).then(existingUser => {
+      User.findOne({ googleId: profile.id }).then((existingUser) => {
         if (existingUser) {
           // we already have a record with the given profile.id
           console.log('User already exists', profile.id);
@@ -39,10 +40,10 @@ passport.use(
           // we don't have a user record with this id
           // create a new record and save it to the database
           new User({
-            googleId: profile.id
+            googleId: profile.id,
           })
             .save()
-            .then(newUser => done(null, newUser));
+            .then((newUser) => done(null, newUser));
         }
       });
     }
