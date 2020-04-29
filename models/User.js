@@ -9,7 +9,11 @@ const { Schema } = mongoose; // object destructuring. Equivalent to the above
  * We can easily add/subtract properties to schema
  */
 const userSchema = new Schema({
-  googleId: String
+  googleId: String,
+  credits: {
+    type: Number,
+    default: 0,
+  },
 });
 
 // create a new collection called users, specifying a schema userSchema
