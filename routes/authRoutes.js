@@ -15,7 +15,7 @@ module.exports = (app) => {
   // under the hood it does a different thing because it sees the code in the URL and will attempt to
   // exchange the code with the actual user profile
 
-  // passport.authenticate('google') is actually a middleware as well, wich takes the code from the URL and
+  // passport.authenticate('google') is actually a middleware as well, which takes the code from the URL and
   // send it to google in exchange for the user profile, and then it calls the callback function we specify in passport.js
   // to either create a new user in mongodb if this is the first time they log in, or to return an existing user
   // after this middleware is done, it will pass the request to the next middleware

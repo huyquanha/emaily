@@ -3,10 +3,9 @@ const mongoose = require('mongoose');
 const { Schema } = mongoose; // object destructuring. Equivalent to the above
 
 /**
- * Although MongoDB is schema-less, when we use mongoose, it expects to know ahead of time every
- * property that we are going to have in a record => need the Schema
- *
- * We can easily add/subtract properties to schema
+ * Although MongoDB is schema-less, mongoose expects to know ahead of time all properties
+ * we will have in a record
+ * We can easily add/subtract properties to a schema
  */
 const userSchema = new Schema({
   googleId: String,
@@ -16,7 +15,8 @@ const userSchema = new Schema({
   },
 });
 
-// create a new collection called users, specifying a schema userSchema
-// if this collection already exists, mongoose will NOT overwrite existing collections
-// this also loads the users model class into mongoose
+/**
+ * create a new collection 'users' (if not exist) based on userSchema defined above
+ * and loads the users model class into mongoose
+ */
 mongoose.model('users', userSchema);

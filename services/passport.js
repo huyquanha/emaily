@@ -27,10 +27,10 @@ passport.use(
       // the route user will be sent to after they grant us permission
       callbackURL: '/auth/google/callback',
       // add this configuration so passport strategy trust requests coming from Heroku proxy
-      // so it wont' downgrade requests from https to http
+      // so it won't downgrade requests from https to http
       proxy: true,
     },
-    // this callback function will be called after passport send the code back to Google and get the user profile in exchange
+    // this callback function will be called after passport send the code to Google and get the user profile in exchange
     async (accessToken, refreshToken, profile, done) => {
       const existingUser = await User.findOne({ googleId: profile.id });
       if (existingUser) {

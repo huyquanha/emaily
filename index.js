@@ -11,11 +11,12 @@ const bodyParser = require('body-parser');
 const keys = require('./config/keys');
 /**
  * We need to require User.js before passport.js so that at the time passport.js
- * gets executed, the users model class has already been defined
+ * gets executed, the users model class has already been defined inside mongoose
  */
 require('./models/User');
+require('./models/Survey');
 /*
-    we do this to ensure all configuration in passport.js gets executed
+    we require this to ensure all the code inside passport.js gets executed
     Since passport.js doesn't export anything, we don't need to assign this require to anything
 */
 require('./services/passport');
@@ -46,6 +47,7 @@ app.use(passport.session());
 // get the function from authRoutes.js and call it immediately after requiring, passing in app
 require('./routes/authRoutes')(app);
 require('./routes/billingRoutes')(app);
+require('./routes/surveyRoutes')(app);
 
 if (process.env.NODE_ENV === 'production') {
   // Express will serve up production assets like our main.js or main.css file

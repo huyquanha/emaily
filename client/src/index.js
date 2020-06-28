@@ -10,6 +10,9 @@ import reduxThunk from 'redux-thunk';
 
 import App from './components/App';
 import reducers from './reducers';
+// development only axios helpers!
+import axios from 'axios';
+window.axios = axios;
 
 /**
  * The purpose of redux-thunk as a middleware is to inspect the values returned by the action creators
