@@ -7,6 +7,7 @@ const requireLogin = require('../middlewares/requireLogin');
 const requireCredits = require('../middlewares/requireCredits');
 const Mailer = require('../services/Mailer');
 const surveyTemplate = require('../services/emailTemplates/surveyTemplate');
+const HttpStatus = require('http-status-codes');
 
 /**
  * we certainly could require Survey.js directly here, but some testing frameworks, when working
@@ -17,6 +18,7 @@ const surveyTemplate = require('../services/emailTemplates/surveyTemplate');
  */
 
 const Survey = mongoose.model('surveys');
+const SURVEY_PAGE_LIMIT = 4;
 
 module.exports = (app) => {
   app.get('/api/surveys', requireLogin, async (req, res) => {
@@ -28,21 +30,49 @@ module.exports = (app) => {
     res.send(surveys);
   });
 
+  app.get('/api/surveys/pageCount', requireLogin, async (req, res) => {
+    const count = await Survey.countDocuments({
+      _user: req.user.id,
+    });
+    res.send({
+      pageCount: Math.ceil(count / SURVEY_PAGE_LIMIT),
+    });
+  });
+
+  app.get('/api/surveys/:page', requireLogin, async (req, res) => {
+    const page = req.params.page;
+    const surveys = await Survey.find({
+      _user: req.user.id,
+    })
+      .skip((page - 1) * SURVEY_PAGE_LIMIT)
+      .limit(SURVEY_PAGE_LIMIT)
+      .select({ recipients: false });
+
+    res.send(surveys);
+  });
+
   app.get('/api/surveys/:surveyId/:choice', (req, res) => {
     res.send('Thanks for voting!');
   });
 
+  app.delete('/api/surveys/:surveyId', requireLogin, (req, res) => {
+    const surveyId = req.params.surveyId;
+    Survey.deleteOne({
+      _id: surveyId,
+      _user: req.user.id,
+    }).exec();
+    res.status(HttpStatus.NO_CONTENT).send();
+  });
+
   app.post('/api/surveys/webhooks', (req, res) => {
     const p = new Path('/api/surveys/:surveyId/:choice');
-    console.log(req.body);
+
     _.chain(req.body)
       .filter(({ event }) => event === 'click')
       .map(({ email, url }) => {
         // p.test() will try to extract surveyId and choice from pathname
         // if the pathname doesn't conform to the pattern in Path(), p.test() returns null
         // cannot destructure it to { surveyId, choice } here because match can be null
-        console.log(email);
-        console.log(url);
         const match = p.test(new URL(url).pathname);
         if (match) {
           return { email, ...match };
@@ -73,13 +103,14 @@ module.exports = (app) => {
   });
 
   app.post('/api/surveys', requireLogin, requireCredits, async (req, res) => {
-    const { title, subject, body, recipients } = req.body;
+    const { title, subject, body, from, recipients } = req.body;
 
     const survey = new Survey({
       // ES6 syntax when key and value variable has the same name
       title,
       body,
       subject,
+      from,
       recipients: recipients.split(',').map((email) => ({
         // we trim the email because the list might be comma and space seperated, so after splitting by comma
         // there might be some leading and trailing whitespaces that need to be removed
@@ -102,7 +133,7 @@ module.exports = (app) => {
 
       res.send(user);
     } catch (err) {
-      res.status(422).send(err);
+      res.status(HttpStatus.UNPROCESSABLE_ENTITY).send(err);
     }
   });
 };

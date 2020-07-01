@@ -59,6 +59,8 @@ function validate(values) {
   // values.recipients is still undefined, we will replace it with '' instead to avoid exception when splitting on undefined
   errors.recipients = validateEmails(values.recipients || '');
 
+  errors.from = validateEmails(values.from || '');
+
   // notice we use the same property name (ex: title) for errors
   // when Redux form sees this it will match up this error with the field of the same name (title)
   // and pass the error as a prop to our custom component (SurveyField of Field named title) so we can show it

@@ -6,6 +6,7 @@ const surveySchema = new Schema({
   title: String,
   body: String,
   subject: String,
+  from: String,
   // recipients will be an array of sub-documents that conform to RecipientSchema
   recipients: [RecipientSchema],
   yes: {

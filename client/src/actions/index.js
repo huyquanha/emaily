@@ -1,6 +1,12 @@
 import axios from 'axios';
 // if not a default export, the import must refer the same name in types.js, so the name has to be FETCH_USER
-import { FETCH_USER, FETCH_SURVEYS } from './types';
+import {
+  FETCH_USER,
+  FETCH_SURVEYS,
+  DELETE_SURVEY,
+  SORT_SURVEYS,
+  FETCH_SURVEY_PAGE_COUNT,
+} from './types';
 
 // whenever fetchUser() is called, it will instantly return a function, that will make an ajax request to backend
 // this returned function will goes through redux-thunk middleware that we already register in index.js
@@ -10,7 +16,7 @@ import { FETCH_USER, FETCH_SURVEYS } from './types';
 
 // With the dispatch function, we can send the action to the reducers anytime we want, instead of immediately
 // In this case, we want to dispatch an action only after our axios request has been successfully completed and returned
-export const fetchUser = () => async (dispatch) => {
+export const fetchUser = (history) => async (dispatch) => {
   const res = await axios.get('/api/current_user');
   dispatch({ type: FETCH_USER, payload: res.data });
 };
@@ -33,7 +39,27 @@ export const submitSurvey = (values, history) => async (dispatch) => {
   dispatch({ type: FETCH_USER, payload: res.data });
 };
 
-export const fetchSurveys = () => async (dispatch) => {
-  const res = await axios.get('/api/surveys');
+export const fetchSurveys = (page) => async (dispatch) => {
+  const res = await axios.get(`/api/surveys/${page}`);
   dispatch({ type: FETCH_SURVEYS, payload: res.data });
+};
+
+export const deleteSurvey = (surveyId) => async (dispatch) => {
+  await axios.delete(`/api/surveys/${surveyId}`);
+  dispatch({ type: DELETE_SURVEY, payload: surveyId });
+};
+
+export const sortSurveys = (fieldName, order) => {
+  return {
+    type: SORT_SURVEYS,
+    payload: {
+      fieldName,
+      order,
+    },
+  };
+};
+
+export const fetchSurveyPageCount = () => async (dispatch) => {
+  const res = await axios.get('/api/surveys/pageCount');
+  dispatch({ type: FETCH_SURVEY_PAGE_COUNT, payload: res.data });
 };

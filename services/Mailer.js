@@ -3,12 +3,18 @@ const helper = sendgrid.mail;
 const keys = require('../config/keys');
 
 class Mailer extends helper.Mail {
-  constructor({ subject, recipients }, content) {
+  constructor({ subject, from, recipients }, content) {
     super();
 
     // SendGrid specific setup
     this.sgApi = sendgrid(keys.sendGridKey);
-    this.from_email = new helper.Email('hqh719@uowmail.edu.au');
+    // this.from_email = new helper.Email('hqh719@uowmail.edu.au');
+    /**
+     * SendGrid now requires us to verify a Sender's Identity before being able to specify an email
+     * address as a sender => technically this dynamic sender field won't work. We will have
+     * to use hqh719@uowmail.edu.au because that's the only email address that has been verified
+     */
+    this.from_email = new helper.Email(from);
     this.subject = subject;
     this.body = new helper.Content('text/html', content);
     this.recipients = this.formatAddresses(recipients);
