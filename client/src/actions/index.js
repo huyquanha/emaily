@@ -4,7 +4,6 @@ import {
   FETCH_USER,
   FETCH_SURVEYS,
   DELETE_SURVEY,
-  SORT_SURVEYS,
   FETCH_SURVEY_PAGE_COUNT,
 } from './types';
 
@@ -47,16 +46,6 @@ export const fetchSurveys = (page) => async (dispatch) => {
 export const deleteSurvey = (surveyId) => async (dispatch) => {
   await axios.delete(`/api/surveys/${surveyId}`);
   dispatch({ type: DELETE_SURVEY, payload: surveyId });
-};
-
-export const sortSurveys = (fieldName, order) => {
-  return {
-    type: SORT_SURVEYS,
-    payload: {
-      fieldName,
-      order,
-    },
-  };
 };
 
 export const fetchSurveyPageCount = () => async (dispatch) => {

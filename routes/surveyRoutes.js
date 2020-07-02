@@ -18,7 +18,7 @@ const HttpStatus = require('http-status-codes');
  */
 
 const Survey = mongoose.model('surveys');
-const SURVEY_PAGE_LIMIT = 4;
+const SURVEY_PAGE_LIMIT = 2;
 
 module.exports = (app) => {
   app.get('/api/surveys', requireLogin, async (req, res) => {
@@ -44,9 +44,10 @@ module.exports = (app) => {
     const surveys = await Survey.find({
       _user: req.user.id,
     })
+      .select({ recipients: false })
+      .sort('-dateSent') // get the most recently sent out surveys first
       .skip((page - 1) * SURVEY_PAGE_LIMIT)
-      .limit(SURVEY_PAGE_LIMIT)
-      .select({ recipients: false });
+      .limit(SURVEY_PAGE_LIMIT);
 
     res.send(surveys);
   });

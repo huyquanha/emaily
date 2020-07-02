@@ -27,4 +27,10 @@ const surveySchema = new Schema({
   lastResponded: Date,
 });
 
+// the order of fields are important: documents are first sorted by _user (ascending index) and then by dateSent (descending index)
+surveySchema.index({
+  _user: 1,
+  dateSent: -1,
+});
+
 mongoose.model('surveys', surveySchema);
